@@ -32,6 +32,7 @@ function fileExists(p){ try { return fs.statSync(p).isFile(); } catch { return f
   // 2) Manifest à la racine (si tu en as déjà un généré, on le garde)
   if (!fileExists(MANIFEST)) {
     const manifest = {
+      id: "/?build=" + Date.now(), // ← force Chrome à considérer chaque build comme une nouvelle app
       name: "DuckManageBase",
       short_name: "DuckManage",
       start_url: ".",
@@ -57,6 +58,11 @@ function fileExists(p){ try { return fs.statSync(p).isFile(); } catch { return f
 
   // 4) Injection <link rel="manifest"> + enregistrement SW + auto-update
   let html = fs.readFileSync(INDEX, 'utf8');
+  // Inject lang="fr" si absent
+  html = html.replace(/<html([^>]*)>/i, (m, attrs) => {
+    if (/lang=/.test(attrs)) return `<html${attrs}>`; 
+    return `<html lang="fr"${attrs}>`;
+  });
 
   if (!/rel=["']manifest["']/.test(html)) {
     html = html.replace(
