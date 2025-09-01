@@ -5,7 +5,8 @@ const path = require('path');
 const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
 const ASSETS_PWA = path.join(ROOT, 'assets', 'pwa');
-const PUBLIC_SW = path.join(ROOT, 'public', 'service-worker.js');
+const PUBLIC_SW = path.join
+(ROOT, 'public', 'service-worker.js');
 const DIST_PWA = path.join(DIST, 'pwa');
 const INDEX = path.join(DIST, 'index.html');
 const DIST_SW = path.join(DIST, 'service-worker.js');
