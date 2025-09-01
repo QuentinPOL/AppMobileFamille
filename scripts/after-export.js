@@ -33,7 +33,7 @@ function fileExists(p){ try { return fs.statSync(p).isFile(); } catch { return f
   if (!fileExists(MANIFEST)) {
     const manifest = {
       name: "AppMobileBase",
-      short_name: "AppMobile",
+      short_name: "PolletApp",
       start_url: ".",
       scope: "/",
       display: "standalone",
