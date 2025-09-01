@@ -22,10 +22,13 @@
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png",
+      "name": "AppMobileBase",
       "shortName": "AppMobile",
+      "display": "standalone",
+      "startUrl": ".",
+      "scope": "/",
       "themeColor": "#ffffff",
-      "backgroundColor": "#ffffff",
-      "display": "standalone"
+      "backgroundColor": "#ffffff"
     },
     "plugins": [
       "expo-router",

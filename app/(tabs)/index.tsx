@@ -6,6 +6,8 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
+import InstallPWAButton from '@/components/InstallPWAButton';
+
 export default function HomeScreen() {
   return (
     <ParallaxScrollView
@@ -22,6 +24,9 @@ export default function HomeScreen() {
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
+        <ThemedView style={{ marginBottom: 12 }}>
+          <InstallPWAButton />
+        </ThemedView>
         <ThemedText>
           Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
           Press{' '}
