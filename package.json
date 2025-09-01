@@ -7,11 +7,12 @@
     "node": "22.x"
   },
   "scripts": {
+    "build": "expo export --platform web",
+    "postbuild": "node scripts/after-export.js",
     "start": "expo start",
+    "web": "expo start --web",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web",
-    "build": "expo export --platform web",
     "lint": "expo lint",
     "reset-project": "node ./scripts/reset-project.js"
   },
