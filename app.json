@@ -28,7 +28,13 @@
       "startUrl": ".",
       "scope": "/",
       "themeColor": "#ffffff",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+        "manifest": {
+    "icons": [
+      { "src": "./assets/pwa/icon-192.png", "sizes": "192x192", "type": "image/png" },
+      { "src": "./assets/pwa/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    ]
+  }
     },
     "plugins": [
       "expo-router",
