@@ -1,82 +1,108 @@
+// components/InstallPWAButton.web.tsx
 import React from "react";
 
-type BeforeInstallPromptEvent = Event & {
+type BIPEvent = Event & {
   prompt?: () => Promise<void>;
   userChoice?: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
 const isStandalone = () =>
-  // Chrome/Edge/Android + Desktop
-  window.matchMedia?.("(display-mode: standalone)").matches
-  // iOS Safari (web app installée depuis l'écran d'accueil)
-  || (window as any).navigator?.standalone === true;
+  window.matchMedia?.("(display-mode: standalone)").matches ||
+  (navigator as any).standalone === true; // iOS
+
+function getInstallHelp() {
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/.test(ua)) {
+    return "Sur iOS : ouvrez ce site dans Safari → bouton Partager → « Ajouter à l’écran d’accueil ».";
+  }
+  if (/Edg\//.test(ua)) {
+    return "Sur Microsoft Edge : menu ⋯ → « Installer cette application ».";
+  }
+  if (/Chrome\//.test(ua)) {
+    return "Sur Chrome : menu ⋮ → « Installer l’application » (ou « Ajouter à l’écran d’accueil » sur Android).";
+  }
+  return "Utilisez le menu du navigateur pour « Installer l’application » / « Ajouter à l’écran d’accueil ».";
+}
 
 export default function InstallPWAButton() {
-  const [deferred, setDeferred] = React.useState<BeforeInstallPromptEvent | null>(null);
-  const [visible, setVisible] = React.useState(false);
+  const [deferred, setDeferred] = React.useState<BIPEvent | null>(null);
+  const [installed, setInstalled] = React.useState(false);
+  const [showHelp, setShowHelp] = React.useState(false);
 
   React.useEffect(() => {
-    // 1) Si déjà installée → ne jamais montrer le bouton
     if (isStandalone() || localStorage.getItem("pwaInstalled") === "1") {
-      setVisible(false);
+      setInstalled(true);
       return;
     }
-
-    // 2) Capturer l’évènement d’installabilité (Chrome/Edge/Android/desktop)
     const onBIP = (e: Event) => {
       e.preventDefault?.();
-      setDeferred(e as BeforeInstallPromptEvent);
-      setVisible(true);
+      setDeferred(e as BIPEvent);
     };
-    window.addEventListener("beforeinstallprompt", onBIP);
-
-    // 3) Si l’installation vient d’avoir lieu → masquer et marquer “installé”
     const onInstalled = () => {
       localStorage.setItem("pwaInstalled", "1");
+      setInstalled(true);
       setDeferred(null);
-      setVisible(false);
+      setShowHelp(false);
     };
-    window.addEventListener("appinstalled", onInstalled);
-
-    // 4) Réagit si l’utilisateur ouvre l’app en standalone (sans rechargement)
     const mql = window.matchMedia?.("(display-mode: standalone)");
-    const onDisplayModeChange = () => {
-      if (mql?.matches) {
-        localStorage.setItem("pwaInstalled", "1");
-        setVisible(false);
-      }
+    const onDisplayChange = () => {
+      if (mql?.matches) onInstalled();
     };
-    mql?.addEventListener?.("change", onDisplayModeChange);
+
+    window.addEventListener("beforeinstallprompt", onBIP);
+    window.addEventListener("appinstalled", onInstalled);
+    mql?.addEventListener?.("change", onDisplayChange);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", onBIP);
       window.removeEventListener("appinstalled", onInstalled);
-      mql?.removeEventListener?.("change", onDisplayModeChange);
+      mql?.removeEventListener?.("change", onDisplayChange);
     };
   }, []);
 
-  const onClick = async () => {
-    if (!deferred?.prompt) return;
-    await deferred.prompt();
-    setDeferred(null);
-    // Le résultat (accepted/dismissed) peut être lu via deferred.userChoice si tu veux logger
-    setVisible(false);
+  if (installed) return null;
+
+  const handleClick = async () => {
+    setShowHelp(false);
+    if (deferred?.prompt) {
+      await deferred.prompt();
+      // le navigateur émettra appinstalled si accepté
+      setDeferred(null);
+    } else {
+      // pas de prompt dispo -> afficher l’aide
+      setShowHelp(true);
+    }
   };
 
-  if (!visible) return null;
-
   return (
-    <button
-      onClick={onClick}
-      style={{
-        padding: 10,
-        borderRadius: 8,
-        border: "1px solid #ddd",
-        background: "transparent",
-        cursor: "pointer"
-      }}
-    >
-      Installer l’app
-    </button>
+    <div style={{ display: "inline-block" }}>
+      <button
+        onClick={handleClick}
+        style={{
+          padding: 10,
+          borderRadius: 8,
+          border: "1px solid #ddd",
+          background: "transparent",
+          cursor: "pointer"
+        }}
+      >
+        Installer l’app
+      </button>
+      {showHelp && (
+        <div
+          style={{
+            marginTop: 8,
+            padding: 10,
+            borderRadius: 8,
+            border: "1px solid #eee",
+            background: "#fafafa",
+            maxWidth: 420
+          }}
+        >
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>Comment installer ?</div>
+          <div style={{ fontSize: 14, lineHeight: 1.4 }}>{getInstallHelp()}</div>
+        </div>
+      )}
+    </div>
   );
 }
