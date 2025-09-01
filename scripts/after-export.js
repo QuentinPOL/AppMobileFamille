@@ -32,8 +32,8 @@ function fileExists(p){ try { return fs.statSync(p).isFile(); } catch { return f
   // 2) Manifest à la racine (si tu en as déjà un généré, on le garde)
   if (!fileExists(MANIFEST)) {
     const manifest = {
-      name: "AppMobileBase",
-      short_name: "PolletApp",
+      name: "DuckManageBase",
+      short_name: "DuckManage",
       start_url: ".",
       scope: "/",
       display: "standalone",
