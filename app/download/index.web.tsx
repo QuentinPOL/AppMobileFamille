@@ -21,7 +21,6 @@ export default function DownloadWeb() {
       {/* Bouton PWA (uniquement sur le Web grâce au .web.tsx) */}
       <InstallPWAButton />
 
-
       <View style={{ marginTop: 8 }}>
         <Text style={{ fontSize: 12, opacity: 0.6, textAlign: "center" }}>
           iOS : Safari → Partager → « Ajouter à l’écran d’accueil ».{"\n"}

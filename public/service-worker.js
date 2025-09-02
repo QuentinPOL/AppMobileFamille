@@ -27,30 +27,18 @@ self.addEventListener("activate", (event) => {
 });
 
 // Politique de fetch :
-// - Ne JAMAIS intercepter les requêtes non-GET
-// - Ne pas intercepter l'API (same-origin) /api/*
-// - HTML (navigations) : réseau d'abord
-// - Ressources statiques (JS/CSS/images) : network-first + fallback cache
+// - HTML (navigations) : réseau d'abord (pas de cache offline pour le HTML → version fraîche)
+// - Autres ressources (JS/CSS/images) : network-first + fallback cache
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-
-  // ⛔️ 1) Laisse passer POST/PUT/PATCH/DELETE
-  if (req.method !== "GET") return;
-
-  const url = new URL(req.url);
-
-  // ⛔️ 2) N'intercepte pas l'API same-origin
-  if (url.origin === self.location.origin && url.pathname.startsWith("/api/")) return;
-
-  // ✅ 3) HTML → réseau d'abord
   const accept = req.headers.get("accept") || "";
+
   const isHTML = req.mode === "navigate" || accept.includes("text/html");
   if (isHTML) {
     event.respondWith(fetch(req).catch(() => caches.match(req)));
     return;
   }
 
-  // ✅ 4) Autres GET → network-first + fallback cache
   event.respondWith((async () => {
     try {
       const res = await fetch(req);
