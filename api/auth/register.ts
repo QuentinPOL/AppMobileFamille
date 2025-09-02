@@ -1,6 +1,6 @@
-import { prisma } from '@/api/_lib/prisma';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
+import { prisma } from '../_lib/prisma';
 
 const ALLOWED_ORIGINS = [
   'http://localhost:3000', // vercel dev

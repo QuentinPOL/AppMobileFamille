@@ -1,5 +1,5 @@
-import { prisma } from '@/api/_lib/prisma';
 import jwt from 'jsonwebtoken';
+import { prisma } from '../_lib/prisma';
 
 function setCors(res: any, origin: string | null) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');

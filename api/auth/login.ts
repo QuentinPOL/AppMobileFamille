@@ -1,7 +1,7 @@
-import { prisma } from '@/api/_lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
+import { prisma } from '../_lib/prisma';
 
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
