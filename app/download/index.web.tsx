@@ -15,7 +15,7 @@ export default function DownloadWeb() {
 
       <Text style={{ opacity: 0.8, textAlign: "center", maxWidth: 520 }}>
         Pour une meilleure expérience, installe l’app sur ton téléphone.
-        Tu peux l’installer comme PWA ou utiliser les stores si dispo.
+        Tu peux l’installer comme PWA.
       </Text>
 
       {/* Bouton PWA (uniquement sur le Web grâce au .web.tsx) */}
