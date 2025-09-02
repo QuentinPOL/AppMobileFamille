@@ -4,23 +4,34 @@
   "private": true,
   "main": "expo-router/entry",
   "engines": {
-    "node": "22.x"
+    "node": ">=20"
   },
   "scripts": {
-    "build": "expo export --platform web",
+    "build:web": "expo export --platform web",
+    "build": "npm run build:web && npm run build:api",
     "postbuild": "node scripts/after-export.js",
     "start": "expo start",
     "web": "expo start --web",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "lint": "expo lint",
-    "reset-project": "node ./scripts/reset-project.js"
+    "reset-project": "node ./scripts/reset-project.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:reset": "prisma migrate reset --force",
+    "prisma:studio": "prisma studio",
+    "dev:api": "cross-env PORT=3001 tsx watch api/index.ts",
+    "dev:app": "expo start",
+    "dev": "concurrently -n API,APP -c blue,green \"npm run dev:api\" \"npm run dev:app\""
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
+    "@prisma/client": "^6.15.0",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "expo": "~53.0.22",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
@@ -34,6 +45,8 @@
     "expo-symbols": "~0.4.5",
     "expo-system-ui": "~5.0.11",
     "expo-web-browser": "~14.2.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.5",
@@ -42,13 +55,23 @@
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "zod": "^3.25.76",
+    "expo-secure-store": "~14.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/react": "~19.0.10",
+    "concurrently": "^9.1.0",
+    "cross-env": "^10.0.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
+    "prisma": "^6.15.0",
+    "tsx": "^4.20.5",
     "typescript": "~5.8.3"
   }
 }

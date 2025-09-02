@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // utilisé à l'exécution
+  directUrl = env("DIRECT_URL")   // utilisé pour migrations
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String
+  name          String? 
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions      Session[]
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token      String   @unique      // ex: session token / refresh token si tu veux
+  userAgent  String?               // optionnel: UA du device
+  ip         String?               // optionnel: IP de création
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+/// (Optionnel) Pour des liens de vérification, OTP, etc.
+/// Utile si plus tard tu fais du "magic link".
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@id([identifier, token])
+}
