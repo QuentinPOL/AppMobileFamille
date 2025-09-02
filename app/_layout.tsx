@@ -17,16 +17,15 @@ function RootNavigator() {
     );
   }
 
+  // 🔑 Redirection gérée ici (à l'extérieur du Stack)
+  if (!user) return <Redirect href="/login" />;
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      {/* Écrans toujours déclarés pour le FS routing */}
+      <Stack.Screen name="(tabs)" />
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
-      <Stack.Screen name="(tabs)" />
       <Stack.Screen name="+not-found" />
-
-      {/* Redirections en fonction de l'état d'auth */}
-      {user ? <Redirect href="/(tabs)" /> : <Redirect href="/login" />}
     </Stack>
   );
 }
