@@ -5,30 +5,53 @@ import React from 'react';
 import { ActivityIndicator, Platform, View } from 'react-native';
 import { AuthProvider, useAuth } from './_providers/AuthProvider';
 
-/** Détecte le mode standalone côté Web (PWA installée / iOS A2HS) */
-function useStandaloneWeb() {
-  const [standalone, setStandalone] = React.useState(false);
+/** Renvoie le display-mode courant: 'standalone' | 'fullscreen' | 'minimal-ui' | 'browser' */
+function getWebDisplayMode(): 'standalone' | 'fullscreen' | 'minimal-ui' | 'browser' {
+  if (typeof window === 'undefined' || Platform.OS !== 'web') return 'browser';
+  try {
+    const modes = ['standalone', 'fullscreen', 'minimal-ui'] as const;
+    for (const m of modes) {
+      if (window.matchMedia?.(`(display-mode: ${m})`).matches) return m;
+    }
+    return 'browser';
+  } catch {
+    return 'browser';
+  }
+}
+
+/** Détecte le mode d’affichage Web et s’abonne aux changements */
+function useWebDisplayMode() {
+  const [mode, setMode] = React.useState<'standalone' | 'fullscreen' | 'minimal-ui' | 'browser'>(() => getWebDisplayMode());
 
   React.useEffect(() => {
     if (Platform.OS !== 'web') return;
-    const mql = window.matchMedia?.('(display-mode: standalone)');
-    const isIOSStandalone = (navigator as any).standalone === true;
-    const compute = () => setStandalone(Boolean(mql?.matches || isIOSStandalone));
-    compute();
-    const onChange = () => compute();
-    mql?.addEventListener?.('change', onChange);
-    return () => mql?.removeEventListener?.('change', onChange);
+
+    const mqls = ['standalone', 'fullscreen', 'minimal-ui'].map((m) =>
+      window.matchMedia?.(`(display-mode: ${m})`)
+    ).filter(Boolean) as MediaQueryList[];
+
+    const recompute = () => setMode(getWebDisplayMode());
+
+    for (const mql of mqls) mql.addEventListener?.('change', recompute);
+    // Fallback: certains navigateurs n’émettent pas 'change'
+    window.addEventListener('visibilitychange', recompute);
+
+    return () => {
+      for (const mql of mqls) mql.removeEventListener?.('change', recompute);
+      window.removeEventListener('visibilitychange', recompute);
+    };
   }, []);
 
-  return standalone;
+  return mode;
 }
 
 function RootNavigator() {
   const { user, loading } = useAuth();
-  const isStandalone = useStandaloneWeb();
+  const webMode = useWebDisplayMode();
+  const isWebBrowser = Platform.OS === 'web' && webMode === 'browser';
 
-  /** 🌐 Web non-installé : exposer UNIQUEMENT /download (== route "download/index") */
-  if (Platform.OS === 'web' && !isStandalone) {
+  /** 🌐 Web non-installé (display-mode: browser) → on n’expose QUE /download */
+  if (isWebBrowser) {
     return (
       <Stack screenOptions={{ headerShown: false }} initialRouteName="download/index">
         <Stack.Screen name="download/index" />
@@ -37,7 +60,7 @@ function RootNavigator() {
     );
   }
 
-  /** ⏳ Chargement */
+  /** ⏳ Chargement (réhydratation du token) */
   if (loading) {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white' }}>
