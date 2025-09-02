@@ -1,8 +1,6 @@
 import { prisma } from '@/api/_lib/prisma';
 import jwt from 'jsonwebtoken';
 
-export const config = { runtime: 'nodejs20.x' };
-
 function setCors(res: any, origin: string | null) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Vary', 'Origin');

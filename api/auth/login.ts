@@ -3,8 +3,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 
-export const config = { runtime: 'nodejs20.x' };
-
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:8081',
