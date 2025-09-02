@@ -49,7 +49,7 @@ export default async function handler(req: any, res: any) {
       return res.status(404).json({ erreur: 'Utilisateur introuvable' });
     }
 
-    return res.status(200).json({ utilisateur: user });
+    return res.status(200).json({ user });
   } catch (err) {
     console.error('❌ Erreur interne:', err);
     return res.status(500).json({ erreur: 'Erreur interne du serveur' });
