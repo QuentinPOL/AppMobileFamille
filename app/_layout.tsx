@@ -1,6 +1,5 @@
-// app/_layout.tsx
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Redirect, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -17,14 +16,21 @@ function RootNavigator() {
     );
   }
 
-  // 🔑 Redirection gérée ici (à l'extérieur du Stack)
-  if (!user) return <Redirect href="/login" />;
+  // 🔒 Non connecté → on n’expose QUE login / register
+  if (!user) {
+    return (
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="login" />
+        <Stack.Screen name="register" />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    );
+  }
 
+  // ✅ Connecté → on n’expose QUE l’app
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="login" />
-      <Stack.Screen name="register" />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
